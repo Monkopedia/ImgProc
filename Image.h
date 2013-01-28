@@ -5,7 +5,19 @@
 #include "Vector2.h"
 #include <string>
 
+#include <wand/MagickWand.h>
+
+#include "Color.h"
+
 namespace ImgProc {
+
+typedef enum {
+    GRAY,
+    RED,
+    GREEN,
+    BLUE,
+    ALPHA,
+} Channel;
 
 /**
  * This will hold the data for all basic images.
@@ -15,18 +27,26 @@ namespace ImgProc {
 class Image : public Variable {
 public:
     Image(const char* file);
+    Image(const ImgProc::Image& base);
+    Image(int width, int height);
 
     virtual ~Image();
 
-    float getGrey(Vector2 position);
-    float getR(Vector2 position);
-    float getG(Vector2 position);
-    float getB(Vector2 position);
+    virtual float getGrey(Vector2 position) const;
+    virtual float getR(Vector2 position) const;
+    virtual float getG(Vector2 position) const;
+    virtual float getB(Vector2 position) const;
+    virtual float getA(Vector2 position) const;
+    virtual float get(Vector2 position, int channel) const;
+    virtual Color get(Vector2 position) const;
 
-    void setGrey(Vector2 position, float value);
-    void setR(Vector2 position, float value);
-    void setG(Vector2 position, float value);
-    void setB(Vector2 position, float value);
+    virtual void setGrey(Vector2 position, float value);
+    virtual void setR(Vector2 position, float value);
+    virtual void setG(Vector2 position, float value);
+    virtual void setB(Vector2 position, float value);
+    virtual void setA(Vector2 position, float value);
+    virtual void set(Vector2 position, int channel, float value);
+    virtual void set(Vector2 position, Color value);
 
     int getWidth() {
         return width;
@@ -38,7 +58,16 @@ public:
 
     void save(const char* file);
 
+    Image operator+(Image other);
+    Image operator-(Image other);
+    Image &operator=(Image other);
+    Image operator+(Color other);
+    Image operator-(Color other);
+    Image &operator=(Color other);
+
 protected:
+    void showError(MagickWand* wand);
+
     void freeMemory();
     void setSize(int width, int height);
 
@@ -48,6 +77,7 @@ private:
     float* red;
     float* blue;
     float* green;
+    float* alpha;
 
 };
 

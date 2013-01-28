@@ -1,16 +1,20 @@
 #include "Image.h"
 #include <stdio.h>
+#include "Invert.h"
 
 int main(int argc, char* argv[]) {
     ImgProc::Image image(argv[1]);
+    ImgProc::Image* proced;
+    ImgProc::Invert inverter;
+    ImgProc::Color color(0, 0, 0, 0);
 
-    for (int i = 0; i < image.getHeight(); i++) {
-        for (int j = 0; j < image.getWidth(); j++) {
-            Vector2 loc(i, j);
-            image.setGrey(loc, 65535 - image.getGrey(loc));
-        }
-    }
-    image.save(argv[2]);
+//    proced = inverter.process(&image);
+    image = (image + color);
+    proced = &image;
+
+    proced->save(argv[2]);
+
+    delete proced;
 
     return 0;
 }
