@@ -161,7 +161,9 @@ namespace ImgProc {
         MagickWandTerminus();
     }
 
-    inline int Image::I(int x, int y) const {
+    inline int Image::I(Vector2 p) const {
+        int x = p.x();
+        int y = p.y();
         if (x < 0) x = 0;
         else if (x >= height) x = height - 1;
         if (y < 0) y = 0;
@@ -177,19 +179,19 @@ namespace ImgProc {
     }
 
     float Image::getR(Vector2 position) const {
-        return red[I(position.x(), position.y())];
+        return red[this->I(position)];
     }
 
     float Image::getG(Vector2 position) const {
-        return green[I(position.x(), position.y())];
+        return green[this->I(position)];
     }
 
     float Image::getB(Vector2 position) const {
-        return blue[I(position.x(), position.y())];
+        return blue[this->I(position)];
     }
 
     float Image::getA(Vector2 position) const {
-        return alpha[I(position.x(), position.y())];
+        return alpha[this->I(position)];
     }
 
     float Image::get(Vector2 position, int channel) const {
@@ -221,19 +223,19 @@ namespace ImgProc {
     }
 
     void Image::setR(Vector2 position, float value) {
-        red[I(position.x(), position.y())] = value;
+        red[this->I(position)] = value;
     }
 
     void Image::setG(Vector2 position, float value) {
-        green[I(position.x(), position.y())] = value;
+        green[this->I(position)] = value;
     }
 
     void Image::setB(Vector2 position, float value) {
-        blue[I(position.x(), position.y())] = value;
+        blue[this->I(position)] = value;
     }
 
     void Image::setA(Vector2 position, float value) {
-        alpha[I(position.x(), position.y())] = value;
+        alpha[this->I(position)] = value;
     }
 
     void Image::set(Vector2 position, int channel, float value) {

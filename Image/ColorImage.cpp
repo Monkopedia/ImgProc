@@ -54,43 +54,43 @@ namespace ImgProc {
 
 
 float ColorImage::getR(Vector2 position) const {
-    return image[I(position.x(), position.y())].r;
+    return image[this->I(position)].r;
 }
 
 float ColorImage::getG(Vector2 position) const {
-    return image[I(position.x(), position.y())].g;
+    return image[this->I(position)].g;
 }
 
 float ColorImage::getB(Vector2 position) const {
-    return image[I(position.x(), position.y())].b;
+    return image[this->I(position)].b;
 }
 
 float ColorImage::getA(Vector2 position) const {
-    return image[I(position.x(), position.y())].a;
+    return image[this->I(position)].a;
 }
 
 Color ColorImage::get(Vector2 position) const {
-    return image[I(position.x(), position.y())];
+    return image[this->I(position)];
 }
 
 void ColorImage::setR(Vector2 position, float value) {
-    image[I(position.x(), position.y())].r = value;
+    image[this->I(position)].r = value;
 }
 
 void ColorImage::setG(Vector2 position, float value) {
-    image[I(position.x(), position.y())].g = value;
+    image[this->I(position)].g = value;
 }
 
 void ColorImage::setB(Vector2 position, float value) {
-    image[I(position.x(), position.y())].b = value;
+    image[this->I(position)].b = value;
 }
 
 void ColorImage::setA(Vector2 position, float value) {
-    image[I(position.x(), position.y())].a = value;
+    image[this->I(position)].a = value;
 }
 
 void ColorImage::set(Vector2 position, Color value) {
-    image[I(position.x(), position.y())] = value;
+    image[this->I(position)] = value;
 }
 
 void ColorImage::setSize(int width, int height) {

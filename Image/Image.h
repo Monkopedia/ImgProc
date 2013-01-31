@@ -68,8 +68,8 @@ public:
 
     virtual void freeMemory();
     virtual void setSize(int width, int height);
+    virtual int I(Vector2 p) const;
 protected:
-    int I(int x, int y) const;
     
     void loadFile(const char* file);
     void showError(MagickWand* wand);
