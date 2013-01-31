@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define I(x, y) ((x * width) + y)
 
 namespace ImgProc {
 
@@ -11,7 +10,12 @@ namespace ImgProc {
         red = NULL;
         blue = NULL;
         green = NULL;
-        long y;
+        alpha = NULL;
+        loadFile(file);
+    }
+
+    void Image::loadFile(const char* file) {
+        int y;
 
         MagickBooleanType status;
         MagickWand *image_wand;
@@ -19,7 +23,7 @@ namespace ImgProc {
         PixelIterator *iterator;
         PixelWand **pixels;
 
-        register long x;
+        register int x;
         size_t w;
 
         MagickWandGenesis();
@@ -34,7 +38,7 @@ namespace ImgProc {
         }
         height = MagickGetImageHeight(image_wand);
         width = MagickGetImageWidth(image_wand);
-        setSize(width, height);
+        this->setSize(width, height);
         for (y=0; y < height; y++) {
             pixels = PixelGetNextIteratorRow(iterator, &w);
             if (pixels == (PixelWand **) NULL) {
@@ -42,10 +46,9 @@ namespace ImgProc {
             }
             for (x=0; x < (long) width; x++) {
                 PixelGetMagickColor(pixels[x],&pixel);
-                red[I(y, x)] = pixel.red;
-                green[I(y, x)] = pixel.green;
-                blue[I(y, x)] = pixel.blue;
-                alpha[I(y, x)] = pixel.opacity;
+                Color c(pixel.red, pixel.green, pixel.blue, pixel.opacity);
+                Vector2 pos(y, x);
+                this->set(pos, c);
             }
         }
         if (y < (long) MagickGetImageHeight(image_wand)) {
@@ -63,13 +66,12 @@ namespace ImgProc {
         red = NULL;
         blue = NULL;
         green = NULL;
+        alpha = NULL;
         setSize(base.width, base.height);
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);
-                this->setR(pos, base.getR(pos));
-                this->setB(pos, base.getB(pos));
-                this->setG(pos, base.getG(pos));
+                this->set(pos, base.get(pos));
             }
         }
     }
@@ -78,13 +80,13 @@ namespace ImgProc {
         red = NULL;
         blue = NULL;
         green = NULL;
-        setSize(width, height);
+        alpha = NULL;
+        Color c(0, 0, 0);
+        this->setSize(width, height);
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);
-                this->setR(pos, 0);
-                this->setB(pos, 0);
-                this->setG(pos, 0);
+                this->set(pos, c);
             }
         }
     }
@@ -139,10 +141,10 @@ namespace ImgProc {
             for (x=0; x < (long) width; x++) {
                 Vector2 loc(y, x);
                 PixelGetMagickColor(pixels[x],&pixel);
-                pixel.red = getR(loc);
-                pixel.green = getG(loc);
-                pixel.blue = getB(loc);
-                pixel.opacity = getA(loc);
+                pixel.red = this->getR(loc);
+                pixel.green = this->getG(loc);
+                pixel.blue = this->getB(loc);
+                pixel.opacity = this->getA(loc);
                 PixelSetMagickColor(pixels[x],&pixel);
             }
             (void) PixelSyncIterator(iterator);
@@ -158,10 +160,19 @@ namespace ImgProc {
         writeWand = DestroyMagickWand(writeWand);
         MagickWandTerminus();
     }
+
+    inline int Image::I(int x, int y) const {
+        if (x < 0) x = 0;
+        else if (x >= height) x = height - 1;
+        if (y < 0) y = 0;
+        else if (y >= width) y = width - 1;
+        return ((x * width) + y);
+    }
+
     float Image::getGrey(Vector2 position) const {
-        float sum = getR(position);
-        sum += getG(position);
-        sum += getB(position);
+        float sum = this->getR(position);
+        sum += this->getG(position);
+        sum += this->getB(position);
         return sum / 3;
     }
 
@@ -184,15 +195,15 @@ namespace ImgProc {
     float Image::get(Vector2 position, int channel) const {
         switch (channel) {
         case GRAY:
-            return getGrey(position);
+            return this->getGrey(position);
         case RED:
-            return getR(position);
+            return this->getR(position);
         case GREEN:
-            return getG(position);
+            return this->getG(position);
         case BLUE:
-            return getB(position);
+            return this->getB(position);
         case ALPHA:
-            return getA(position);
+            return this->getA(position);
         }
         return 0;
     }
@@ -228,39 +239,46 @@ namespace ImgProc {
     void Image::set(Vector2 position, int channel, float value) {
         switch (channel) {
         case GRAY:
-            setGrey(position, value);
+            this->setGrey(position, value);
         case RED:
-            setR(position, value);
+            this->setR(position, value);
         case GREEN:
-            setG(position, value);
+            this->setG(position, value);
         case BLUE:
-            setB(position, value);
+            this->setB(position, value);
         case ALPHA:
-            setA(position, value);
+            this->setA(position, value);
         }
     }
 
     void Image::set(Vector2 position, Color value) {
-        setR(position, value.r);
-        setG(position, value.g);
-        setB(position, value.b);
-        setA(position, value.a);
+        this->setR(position, value.r);
+        this->setG(position, value.g);
+        this->setB(position, value.b);
+        this->setA(position, value.a);
     }
 
     void Image::freeMemory() {
         if (red != NULL) {
             free(red);
+            red = NULL;
         }
         if (blue != NULL) {
             free(blue);
+            blue = NULL;
         }
         if (green != NULL) {
             free(green);
+            green = NULL;
+        }
+        if (alpha != NULL) {
+            free(alpha);
+            alpha = NULL;
         }
     }
 
     void Image::setSize(int width, int height) {
-        freeMemory();
+        this->freeMemory();
         this->width = width;
         this->height = height;
         int size = width * height;
@@ -270,7 +288,7 @@ namespace ImgProc {
         alpha = (float*)malloc(size * sizeof(float));
     }
 
-    Image Image::operator+(Image base) {
+    Image Image::operator+(Image& base) {
         Image temp(getWidth(), getHeight());
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -281,51 +299,51 @@ namespace ImgProc {
         return temp;
     }
 
-    Image Image::operator-(Image base) {
+    Image Image::operator-(Image& base) {
         Image temp(width, height);
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);
-                temp.set(pos, get(pos) - base.get(pos));
+                temp.set(pos, this->get(pos) - base.get(pos));
             }
         }
         return temp;
     }
 
-    Image &Image::operator=(Image base) {
-        setSize(base.width, base.height);
+    Image &Image::operator=(Image& base) {
+        this->setSize(base.width, base.height);
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);
-                set(pos, base.get(pos));
+                this->set(pos, base.get(pos));
             }
         }
         return *this;
     }
 
-    Image Image::operator+(Color base) {
+    Image Image::operator+(Color& base) {
         Image temp(getWidth(), getHeight());
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);
-                temp.set(pos, get(pos) + base);
+                temp.set(pos, this->get(pos) + base);
             }
         }
         return temp;
     }
 
-    Image Image::operator-(Color base) {
+    Image Image::operator-(Color& base) {
         Image temp(width, height);
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);
-                temp.set(pos, get(pos) - base);
+                temp.set(pos, this->get(pos) - base);
             }
         }
         return temp;
     }
 
-    Image &Image::operator=(Color base) {
+    Image &Image::operator=(Color& base) {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Vector2 pos(i, j);

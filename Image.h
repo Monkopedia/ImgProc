@@ -9,6 +9,7 @@
 
 #include "Color.h"
 
+
 namespace ImgProc {
 
 typedef enum {
@@ -48,36 +49,40 @@ public:
     virtual void set(Vector2 position, int channel, float value);
     virtual void set(Vector2 position, Color value);
 
-    int getWidth() {
+    int getWidth() const {
         return width;
     }
 
-    int getHeight() {
+    int getHeight() const {
         return height;
     }
 
     void save(const char* file);
 
-    Image operator+(Image other);
-    Image operator-(Image other);
-    Image &operator=(Image other);
-    Image operator+(Color other);
-    Image operator-(Color other);
-    Image &operator=(Color other);
+    Image operator+(Image& other);
+    Image operator-(Image& other);
+    Image &operator=(Image& other);
+    Image operator+(Color& other);
+    Image operator-(Color& other);
+    Image &operator=(Color& other);
 
+    virtual void freeMemory();
+    virtual void setSize(int width, int height);
 protected:
+    int I(int x, int y) const;
+    
+    void loadFile(const char* file);
     void showError(MagickWand* wand);
 
-    void freeMemory();
-    void setSize(int width, int height);
 
-private:
     int width;
     int height;
+
     float* red;
     float* blue;
     float* green;
     float* alpha;
+private:
 
 };
 

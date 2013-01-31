@@ -1,0 +1,10 @@
+#include "Image.h"
+
+Image::Image(const char* file) {
+
+    
+}
+
+Image::Image(std::string file) {
+
+}

@@ -8,7 +8,12 @@ public:
     virtual ~Filter() {
     }
 
-    virtual Image* process(Image* image) = 0;
+    Image* process(Image* image) {
+        Image* ret = new Image(image->getWidth(), image->getHeight());
+        process(image, ret);
+        return ret;
+    }
+    virtual void process(Image* image, Image* dest) = 0;
 
 protected:
 

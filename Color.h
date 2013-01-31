@@ -1,7 +1,8 @@
 #ifndef __COLOR_H__
 #define __COLOR_H__
 
-#define MAX_A 1
+#define MAX_A 65535
+#define MAX_VAL 65535
 
 namespace ImgProc {
 
@@ -19,6 +20,9 @@ public:
         this->g = g;
         this->b = b;
         this->a = a;
+        if (this->a == 0) {
+            this->a = MAX_A;
+        }
     }
 
     Color(const Color& base) {
@@ -32,7 +36,18 @@ public:
         a = r = g = b = MAX_A;
     }
 
-    Color operator+(Color other) {
+    void addTo(const Color& other) {
+        r += other.r;
+        if (r > MAX_VAL) r = MAX_VAL;
+        g += other.g;
+        if (g > MAX_VAL) g = MAX_VAL;
+        b += other.b;
+        if (b > MAX_VAL) b = MAX_VAL;
+        a += other.a;
+        if (a > MAX_A) a = MAX_A;
+    }
+
+    Color operator+(const Color& other) {
        Color ret;
        ret.r = alphaBlend(r, other.r, a, other.a);
        ret.g = alphaBlend(g, other.g, a, other.a);
@@ -41,8 +56,17 @@ public:
        if (ret.a > MAX_A) ret.a = MAX_A;
        return ret;
     }
+
+    Color operator*(float amount) {
+        Color ret;
+        ret.r = amount * r;
+        ret.g = amount * g;
+        ret.b = amount * b;
+        ret.a = a;
+        return ret;
+    }
     
-    Color operator-(Color color) {
+    Color operator-(const Color& color) {
         Color ret;
         ret.r = r - color.r;
         ret.g = g - color.g;
@@ -51,7 +75,7 @@ public:
         return ret;
     }
 
-    Color operator=(Color base) {
+    Color operator=(const Color& base) {
         this->r = base.r;
         this->g = base.g;
         this->b = base.b;
@@ -64,10 +88,10 @@ public:
     float g;
     float a;
 
-protected:
     inline float alphaBlend(float c1, float c2, float a1, float a2) {
         return (a1*c1 + a2*c2) / (a1 + a2);
     }
+protected:
 
 private:
 };

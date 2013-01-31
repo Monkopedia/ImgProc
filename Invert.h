@@ -13,18 +13,16 @@ public:
 
     }
 
-    Image* process(Image* image) {
-        Image* ret = new Image(image->getWidth(), image->getHeight());
+    void process(Image* image, Image* dest) {
         for (int i = 0; i < image->getHeight(); i++) {
             for (int j = 0; j < image->getWidth(); j++) {
                 Vector2 pos(i, j);
-                ret->setGrey(pos, MAX_VAL - image->getGrey(pos));
+                dest->setGrey(pos, MAX_VAL - image->getGrey(pos));
 //                ret->setR(pos, MAX_VAL - image->getR(pos));
 //                ret->setG(pos, MAX_VAL - image->getG(pos));
 //                ret->setB(pos, MAX_VAL - image->getB(pos));
             }
         }
-        return ret;
     }
 
 };
