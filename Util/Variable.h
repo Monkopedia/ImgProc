@@ -6,6 +6,11 @@
  * in some future plans as the semester progresses.
  */
 class Variable {
+public:
+
+    virtual ~Variable() {
+
+    }
 
 };
 

@@ -4,8 +4,13 @@
 #include "Invert.h"
 #include "MaskFilter.h"
 #include "Color.h"
+#include "Server.h"
+#include "CommandInterface.h"
+
+using namespace ImgProc;
 
 int main(int argc, char* argv[]) {
+    /*
     float m = 1.0 / 9;
     float mask[3][3] = {
         //{ 0, 0, 0},
@@ -28,6 +33,15 @@ int main(int argc, char* argv[]) {
     maskFilter.process(&image, &cimage);
 
     cimage.save(argv[2]);
+    */
+    if (argc > 1) {
+        CommandInterface c(argc, argv);
+        c.runScript();
+    } else {
+        Server s;
+        CommandInterface c(">");
+        s.run();
+    }
 
     return 0;
 }

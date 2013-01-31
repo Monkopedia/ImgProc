@@ -1,9 +1,12 @@
 #ifndef __FILTER_H__
 #define __FILTER_H__
 
+#include "Image.h"
+#include "Variable.h"
+
 namespace ImgProc {
 
-class Filter {
+class Filter : public Variable {
 public:
     virtual ~Filter() {
     }

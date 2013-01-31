@@ -13,11 +13,11 @@
 namespace ImgProc {
 
 typedef enum {
-    GRAY,
-    RED,
-    GREEN,
-    BLUE,
-    ALPHA,
+    GRAY = 1,
+    RED = 2,
+    GREEN = 3,
+    BLUE = 4,
+    ALPHA = 5,
 } Channel;
 
 /**

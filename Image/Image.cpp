@@ -240,14 +240,19 @@ namespace ImgProc {
         switch (channel) {
         case GRAY:
             this->setGrey(position, value);
+            break;
         case RED:
             this->setR(position, value);
+            break;
         case GREEN:
             this->setG(position, value);
+            break;
         case BLUE:
             this->setB(position, value);
+            break;
         case ALPHA:
             this->setA(position, value);
+            break;
         }
     }
 
