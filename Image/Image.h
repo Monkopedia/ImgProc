@@ -69,6 +69,8 @@ public:
     virtual void freeMemory();
     virtual void setSize(int width, int height);
     virtual int I(Vector2 p) const;
+
+    virtual std::string toString();
 protected:
     
     void loadFile(const char* file);

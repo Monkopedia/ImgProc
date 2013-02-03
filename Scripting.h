@@ -10,6 +10,7 @@ namespace ImgProc {
 typedef void(*funcListener)(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
 
 void echoFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
+void printFunc(std::vector<std::string>* args, CommandInterface* interface);
 void quitFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
 void saveFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
 void loadFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
@@ -19,8 +20,13 @@ void invertFunc(std::vector<std::string>* args, ImgProc::CommandInterface* inter
 void copyFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
 void colorCopyFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
 void histoFunc(std::vector<std::string>* args, ImgProc::CommandInterface* interface);
+void rotateFunc(std::vector<std::string>* args, CommandInterface* interface);
+void defTransFunc(std::vector<std::string>* args, CommandInterface* interface);
+void transformFunc(std::vector<std::string>* args, CommandInterface* interface);
+void combineTransFunc(std::vector<std::string>* args, CommandInterface* interface);
+void medianFunc(std::vector<std::string>* args, CommandInterface* interface);
 
-#define NFUNCS 12
+#define NFUNCS 17
 extern std::pair<std::string*, funcListener> *(functions[NFUNCS]);
 
 }

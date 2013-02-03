@@ -4,6 +4,7 @@
 #include "MaskFilter.h"
 #include "Invert.h"
 #include "InvertChannel.h"
+#include "MedianFilter.h"
 #include "HistogramEqualize.h"
 #include "ColorImage.h"
 
@@ -13,36 +14,61 @@
 
 #include <algorithm>
 
+#include "Rotation.h"
+#include "RotatedImage.h"
+#include "Transform.h"
+#include "TransformImage.h"
+
 using namespace std;
 namespace ImgProc {
 
 pair<string*, funcListener> *(functions[NFUNCS]) = {
 	new pair<string*, funcListener>(new string("echo"), echoFunc),
+	new pair<string*, funcListener>(new string("print"), printFunc),
 	new pair<string*, funcListener>(new string("quit"), quitFunc),
 	new pair<string*, funcListener>(new string("exit"), quitFunc),
 	new pair<string*, funcListener>(new string("load"), loadFunc),
 	new pair<string*, funcListener>(new string("save"), saveFunc),
 	new pair<string*, funcListener>(new string("mask"), neighborFunc),
 	new pair<string*, funcListener>(new string("invert"), invertFunc),
+	new pair<string*, funcListener>(new string("median"), medianFunc),
 	new pair<string*, funcListener>(new string("filter"), filterFunc),
 	new pair<string*, funcListener>(new string("copy"), copyFunc),
 	new pair<string*, funcListener>(new string("colorcopy"), colorCopyFunc),
 	new pair<string*, funcListener>(new string("histoeq"), histoFunc),
+	new pair<string*, funcListener>(new string("rotate"), rotateFunc),
+	new pair<string*, funcListener>(new string("deftrans"), defTransFunc),
+	new pair<string*, funcListener>(new string("combinetrans"), combineTransFunc),
+	new pair<string*, funcListener>(new string("transform"), transformFunc),
 };
+
+string getString(string str, CommandInterface* interface) {
+    if (interface->getVar(str)) {
+        StringVar* filter = dynamic_cast<StringVar*>(interface->getVar(str));
+        if (filter == NULL) {
+            cout << str << " is not a string" << endl;
+        } else {
+            str = filter->str;
+        }
+    }
+    return str;
+}
 
 void echoFunc(vector<string>* args, CommandInterface* interface) {
     for (unsigned int i = 1; i < args->size(); i++) {
-        string var = (*args)[i];
-        if (interface->hasVar(var)) {
-            StringVar* varstr = (dynamic_cast<StringVar*>(interface->getVar(var)));
-            if (varstr == NULL) {
-                cout << var << " is not a string" << endl;
-                return;
-            } else {
-                var = varstr->str;
-            }
-        }
+        string var = getString((*args)[i], interface);
         cout << var << endl;
+    }
+}
+
+void printFunc(vector<string>* args, CommandInterface* interface) {
+    for (unsigned int i = 1; i < args->size(); i++) {
+        Variable* var = interface->getVar((*args)[i]);
+        if (var != NULL) {
+            cout << var->toString() << endl;
+        } else {
+            cout << (*args)[i] << " is not assigned" << endl;
+        }
     }
 }
 
@@ -56,16 +82,7 @@ void loadFunc(vector<string>* args, CommandInterface* interface) {
         cout << "\tLoads an image from target file" << endl;
         return;
     }
-    string filename = (*args)[1];
-    if (interface->hasVar(filename)) {
-        StringVar* var = (dynamic_cast<StringVar*>(interface->getVar(filename)));
-        if (var == NULL) {
-            cout << (*args)[1] << " is not a string" << endl;
-            return;
-        } else {
-            filename = var->str;
-        }
-    }
+    string filename = getString((*args)[1], interface);
     string varname = (*args)[2];
 
     cout << "Loading " << filename << " into " << varname << endl;
@@ -78,16 +95,7 @@ void saveFunc(vector<string>* args, CommandInterface* interface) {
         cout << "\tSaves an image into target file" << endl;
         return;
     }
-    string filename = (*args)[1];
-    if (interface->hasVar(filename)) {
-        StringVar* var = (dynamic_cast<StringVar*>(interface->getVar(filename)));
-        if (var == NULL) {
-            cout << (*args)[1] << " is not a string" << endl;
-            return;
-        } else {
-            filename = var->str;
-        }
-    }
+    string filename = getString((*args)[1], interface);
     string varname = (*args)[2];
 
     Image* image = dynamic_cast<Image*>(interface->getVar(varname));
@@ -188,16 +196,7 @@ void invertFunc(vector<string>* args, CommandInterface* interface) {
         return;
     }
     string varname = (*args)[1];
-    string type = (*args)[2];
-    if (interface->hasVar(type)) {
-        StringVar* typestr = (dynamic_cast<StringVar*>(interface->getVar(type)));
-        if (typestr == NULL) {
-            cout << type << " is not a string" << endl;
-            return;
-        } else {
-            type = typestr->str;
-        }
-    }
+    string type = getString((*args)[2], interface);
 
     int channel = stringToChannel(type);
     if (channel == -1) {
@@ -218,16 +217,7 @@ void histoFunc(vector<string>* args, CommandInterface* interface) {
         return;
     }
     string varname = (*args)[1];
-    string type = (*args)[2];
-    if (interface->hasVar(type)) {
-        StringVar* typestr = (dynamic_cast<StringVar*>(interface->getVar(type)));
-        if (typestr == NULL) {
-            cout << type << " is not a string" << endl;
-            return;
-        } else {
-            type = typestr->str;
-        }
-    }
+    string type = getString((*args)[2], interface);
 
     int channel = stringToChannel(type);
     if (channel == -1) {
@@ -273,12 +263,40 @@ void colorCopyFunc(vector<string>* args, CommandInterface* interface) {
 void rotateFunc(vector<string>* args, CommandInterface* interface) {
     if (args->size() < 4) {
         cout << "Usage: " << (*args)[0] << " amount source dest" << endl;
-        cout << "\tApplies filter on source and stores the resulting image in dest" << endl;
+        cout << "\tRotates source by amount and stores the resulting image in dest" << endl;
         return;
     }
-    Filter* filter = dynamic_cast<Filter*>(interface->getVar((*args)[1]));
-    if (filter == NULL) {
-        cout << (*args)[1] << " is not a filter" << endl;
+    string amount = getString((*args)[1], interface);
+    Image* source = dynamic_cast<Image*>(interface->getVar((*args)[2]));
+    if (source == NULL) {
+        cout << (*args)[2] << " is not an image" << endl;
+        return;
+    }
+    Rotation rot(atof(amount.c_str()));
+    interface->setVar((*args)[3], new RotatedImage(rot, *source));
+    cout << "Applying " << amount << " rotation" << endl;
+}
+
+void defTransFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 5) {
+        cout << "Usage: " << (*args)[0] << " varname amount x y" << endl;
+        cout << "\tCreates a transform" << endl;
+        return;
+    }
+    string var = (*args)[1];
+    string amount = getString((*args)[2], interface);
+    string x = getString((*args)[3], interface);
+    string y = getString((*args)[4], interface);
+
+    Transform* trans = new Transform(atof(amount.c_str()), atof(x.c_str()), atof(y.c_str()));
+    interface->setVar(var, trans);
+    cout << "Creating transform rot: " << amount << " off: " << x << " " << y << endl;
+}
+
+void transformFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 4) {
+        cout << "Usage: " << (*args)[0] << " varname source dest" << endl;
+        cout << "\tTransform source using varname and stores the resulting image in dest" << endl;
         return;
     }
     Image* source = dynamic_cast<Image*>(interface->getVar((*args)[2]));
@@ -286,14 +304,54 @@ void rotateFunc(vector<string>* args, CommandInterface* interface) {
         cout << (*args)[2] << " is not an image" << endl;
         return;
     }
-    /*
-    Image* dest = dynamic_cast<Image*>(interface->getVar((*args)[3]));
-    if (dest == NULL) {
-        dest = new Image(*source);
-        interface->setVar((*args)[3], dest);
+    Transform* transform = dynamic_cast<Transform*>(interface->getVar((*args)[1]));
+    if (transform == NULL) {
+        cout << (*args)[1] << " is not a transform" << endl;
+        return;
     }
-    */
-    cout << "Applying " << (*args)[1] << " filter" << endl;
+    interface->setVar((*args)[3], new TransformImage(*transform, *source));
+    cout << "Applying transform" << endl;
+}
+
+void combineTransFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname first second" << endl;
+        cout << "\tSets varname to be first * second" << endl;
+        return;
+    }
+    string var = (*args)[1];
+    Transform* transform = dynamic_cast<Transform*>(interface->getVar((*args)[2]));
+    if (transform == NULL) {
+        cout << (*args)[2] << " is not a transform" << endl;
+        return;
+    }
+    Transform* transform2 = dynamic_cast<Transform*>(interface->getVar((*args)[3]));
+    if (transform == NULL) {
+        cout << (*args)[2] << " is not a transform" << endl;
+        return;
+    }
+    interface->setVar(var, new Transform((*transform) * (*transform2)));
+}
+
+void medianFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a median filter" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new MedianFilter(channel));
+    cout << "Created " << type << " median filter in " << varname << endl;
 }
 
 

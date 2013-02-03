@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 
+#include <sstream>
+using namespace std;
+
 namespace ImgProc {
 
 
@@ -102,7 +105,12 @@ void ColorImage::setSize(int width, int height) {
 }
 
 
+std::string ColorImage::toString() {
+    stringstream stream("Color Image (");
 
+    stream << width << "x" << height << " px)";
+    return stream.str();
+}
 
 
 

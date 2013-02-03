@@ -18,6 +18,9 @@ public:
     }
     virtual void process(Image* image, Image* dest) = 0;
 
+    virtual std::string toString() {
+        return "Filter: Needs to be overloaded...";
+    }
 protected:
 
 private:

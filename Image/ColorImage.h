@@ -31,6 +31,8 @@ public:
 
     virtual void setSize(int width, int height);
     void freeMemory();
+
+    virtual std::string toString();
 protected:
 
 private:

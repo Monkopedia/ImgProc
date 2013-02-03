@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <sstream>
+
+using namespace std;
 
 namespace ImgProc {
 
@@ -358,5 +361,12 @@ namespace ImgProc {
             }
         }
         return *this;
+    }
+
+    std::string Image::toString() {
+        stringstream stream("Image (");
+
+        stream << width << "x" << height << " px)";
+        return stream.str();
     }
 }

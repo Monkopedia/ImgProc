@@ -17,6 +17,9 @@ public:
 
     }
 
+    virtual std::string toString() {
+        return str;
+    }
     std::string str;
 };
 

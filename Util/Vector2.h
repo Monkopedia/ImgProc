@@ -1,6 +1,8 @@
 #ifndef __VECTOR2_H__
 #define __VECTOR2_H__
 
+#include <sstream>
+
 /**
  * Utility class to help handle image locations.
  * costructor accepts ints but all locations are stored
@@ -23,19 +25,19 @@ public:
         myY = 0;
     }
 
-    inline float getX() {
+    inline float getX() const {
         return myX;
     }
 
-    inline float getY() {
+    inline float getY() const {
         return myY;
     }
 
-    inline int x() {
+    inline int x() const {
         return (int)(myX);
     }
 
-    inline int y() {
+    inline int y() const {
         return (int)(myY);
     }
 
@@ -60,6 +62,13 @@ public:
         return *this;
     }
 
+    virtual std::string toString() {
+        std::stringstream stream("Vector2 (");
+
+        stream << myX << "," << myY << ")";
+
+        return stream.str();
+    }
 protected:
 
 private:
