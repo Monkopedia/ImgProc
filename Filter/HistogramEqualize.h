@@ -33,10 +33,9 @@ public:
         }
         for (int i = 1; i <= MAX_VAL; i++) {
             counts[i] = (counts[i] + counts[i - 1]);
+            counts[i - 1] *= scale;
         }
-        for (int i = 0; i <= MAX_VAL; i++) {
-            counts[i] *= scale;
-        }
+        counts[MAX_VAL-1] *= scale;
         for (int i = 0; i < image->getHeight(); i++) {
             for (int j = 0; j < image->getWidth(); j++) {
                 Vector2 pos(i, j);
