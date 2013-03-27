@@ -5,6 +5,11 @@
 #include "Invert.h"
 #include "InvertChannel.h"
 #include "MedianFilter.h"
+#include "SobelFilter.h"
+#include "LaplacianFilter.h"
+#include "ErodeFilter.h"
+#include "DilationFilter.h"
+#include "ThresholdFilter.h"
 #include "HistogramEqualize.h"
 #include "ColorImage.h"
 
@@ -32,6 +37,11 @@ pair<string*, funcListener> *(functions[NFUNCS]) = {
 	new pair<string*, funcListener>(new string("mask"), neighborFunc),
 	new pair<string*, funcListener>(new string("invert"), invertFunc),
 	new pair<string*, funcListener>(new string("median"), medianFunc),
+	new pair<string*, funcListener>(new string("sobel"), sobelFunc),
+	new pair<string*, funcListener>(new string("laplace"), laplaceFunc),
+	new pair<string*, funcListener>(new string("erode"), erodeFunc),
+	new pair<string*, funcListener>(new string("dilate"), dilateFunc),
+	new pair<string*, funcListener>(new string("threshold"), thresholdFunc),
 	new pair<string*, funcListener>(new string("filter"), filterFunc),
 	new pair<string*, funcListener>(new string("copy"), copyFunc),
 	new pair<string*, funcListener>(new string("colorcopy"), colorCopyFunc),
@@ -353,6 +363,115 @@ void medianFunc(vector<string>* args, CommandInterface* interface) {
     interface->setVar(varname, new MedianFilter(channel));
     cout << "Created " << type << " median filter in " << varname << endl;
 }
+
+void sobelFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a sobel filter" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new SobelFilter(channel));
+    cout << "Created " << type << " sobel filter in " << varname << endl;
+}
+
+void laplaceFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a laplace filter" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new LaplacianFilter(channel));
+    cout << "Created " << type << " laplacian filter in " << varname << endl;
+}
+
+void erodeFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a erode filter" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new ErodeFilter(channel));
+    cout << "Created " << type << " erode filter in " << varname << endl;
+}
+
+void dilateFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a dilate filter" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new DilationFilter(channel));
+    cout << "Created " << type << " dilate filter in " << varname << endl;
+}
+
+void thresholdFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 4) {
+        cout << "Usage: " << (*args)[0] << " varname type threshold" << endl;
+        cout << "\tDefines a laplace filter" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    string threshold = getString((*args)[3], interface);
+    float thresh = atof(threshold.c_str());
+
+    interface->setVar(varname, new ThresholdFilter(channel, thresh));
+    cout << "Created " << type << " threshold filter in " << varname << endl;
+}
+
 
 
 }

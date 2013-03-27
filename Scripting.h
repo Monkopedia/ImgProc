@@ -25,8 +25,13 @@ void defTransFunc(std::vector<std::string>* args, CommandInterface* interface);
 void transformFunc(std::vector<std::string>* args, CommandInterface* interface);
 void combineTransFunc(std::vector<std::string>* args, CommandInterface* interface);
 void medianFunc(std::vector<std::string>* args, CommandInterface* interface);
+void sobelFunc(std::vector<std::string>* args, CommandInterface* interface);
+void laplaceFunc(std::vector<std::string>* args, CommandInterface* interface);
+void erodeFunc(std::vector<std::string>* args, CommandInterface* interface);
+void dilateFunc(std::vector<std::string>* args, CommandInterface* interface);
+void thresholdFunc(std::vector<std::string>* args, CommandInterface* interface);
 
-#define NFUNCS 17
+#define NFUNCS 22
 extern std::pair<std::string*, funcListener> *(functions[NFUNCS]);
 
 }
