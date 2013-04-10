@@ -13,6 +13,10 @@ public:
         this->str = str;
     }
 
+    StringVar() {
+        this->str = "";
+    }
+
     ~StringVar() {
 
     }

@@ -12,6 +12,8 @@
 #include "ThresholdFilter.h"
 #include "HistogramEqualize.h"
 #include "ColorImage.h"
+#include "Area.h"
+#include "Perimeter.h"
 
 #include "Server.h"
 
@@ -50,6 +52,9 @@ pair<string*, funcListener> *(functions[NFUNCS]) = {
 	new pair<string*, funcListener>(new string("deftrans"), defTransFunc),
 	new pair<string*, funcListener>(new string("combinetrans"), combineTransFunc),
 	new pair<string*, funcListener>(new string("transform"), transformFunc),
+	new pair<string*, funcListener>(new string("area"), areaFunc),
+	new pair<string*, funcListener>(new string("perimeter"), perimeterFunc),
+	new pair<string*, funcListener>(new string("descriptor"), descriptorFunc),
 };
 
 string getString(string str, CommandInterface* interface) {
@@ -451,7 +456,7 @@ void dilateFunc(vector<string>* args, CommandInterface* interface) {
 void thresholdFunc(vector<string>* args, CommandInterface* interface) {
     if (args->size() < 4) {
         cout << "Usage: " << (*args)[0] << " varname type threshold" << endl;
-        cout << "\tDefines a laplace filter" << endl;
+        cout << "\tDefines a threshold filter" << endl;
         printChannelTypes(cout);
         cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
         return;
@@ -471,6 +476,76 @@ void thresholdFunc(vector<string>* args, CommandInterface* interface) {
     interface->setVar(varname, new ThresholdFilter(channel, thresh));
     cout << "Created " << type << " threshold filter in " << varname << endl;
 }
+
+void areaFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a area calculator" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new Area(channel));
+    cout << "Created " << type << " area calculator" << endl;
+}
+
+void perimeterFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname type" << endl;
+        cout << "\tDefines a perimeter calculator" << endl;
+        printChannelTypes(cout);
+        cout << "\tNote: Gray will convert resulting image to grayscale" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = stringToChannel(type);
+    if (channel == -1) {
+        cout << type << " is not a valid type" << endl;
+        return;
+    }
+
+    interface->setVar(varname, new Perimeter(channel));
+    cout << "Created " << type << " perimeter calculator" << endl;
+}
+
+
+
+void descriptorFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 4) {
+        cout << "Usage: " << (*args)[0] << " descriptor source dest" << endl;
+        cout << "\tCalculates descriptor from source and stores the resulting in dest" << endl;
+        return;
+    }
+    Descriptor* filter = dynamic_cast<Descriptor*>(interface->getVar((*args)[1]));
+    if (filter == NULL) {
+        cout << (*args)[1] << " is not a filter" << endl;
+        return;
+    }
+    Image* source = dynamic_cast<Image*>(interface->getVar((*args)[2]));
+    if (source == NULL) {
+        cout << (*args)[2] << " is not an image" << endl;
+        return;
+    }
+    Variable* dest = dynamic_cast<Variable*>(interface->getVar((*args)[3]));
+    if (dest == NULL) {
+        dest = new StringVar();
+        interface->setVar((*args)[3], dest);
+    }
+    filter->process(source, dest);
+    cout << "Calculating " << (*args)[1] << " descriptor" << endl;
+}
+
 
 
 

@@ -13,6 +13,7 @@ DIRS:
 	+$(MAKE) -C Util
 	+$(MAKE) -C Filter
 	+$(MAKE) -C Image
+	+$(MAKE) -C Descriptors
 
 $(TARGET): DIRS $(OBJS)
 	$(CC) -o $(TARGET) $(CFLAGS) $(OBJDIR)/*.o $(LIBS)
