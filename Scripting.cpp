@@ -14,6 +14,7 @@
 #include "ColorImage.h"
 #include "Area.h"
 #include "Perimeter.h"
+#include "MomentInvariant.h"
 
 #include "Server.h"
 
@@ -53,6 +54,7 @@ pair<string*, funcListener> *(functions[NFUNCS]) = {
 	new pair<string*, funcListener>(new string("combinetrans"), combineTransFunc),
 	new pair<string*, funcListener>(new string("transform"), transformFunc),
 	new pair<string*, funcListener>(new string("area"), areaFunc),
+	new pair<string*, funcListener>(new string("moment"), miFunc),
 	new pair<string*, funcListener>(new string("perimeter"), perimeterFunc),
 	new pair<string*, funcListener>(new string("descriptor"), descriptorFunc),
 };
@@ -545,6 +547,22 @@ void descriptorFunc(vector<string>* args, CommandInterface* interface) {
     filter->process(source, dest);
     cout << "Calculating " << (*args)[1] << " descriptor" << endl;
 }
+
+void miFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 3) {
+        cout << "Usage: " << (*args)[0] << " varname which" << endl;
+        cout << "\tDefines a moment invariant calculator" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+    string type = getString((*args)[2], interface);
+
+    int channel = atoi(type.c_str());
+
+    interface->setVar(varname, new MomentInvariant(channel));
+    cout << "Created " << channel << " moment invariant calculator" << endl;
+}
+
 
 
 

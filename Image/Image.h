@@ -8,7 +8,7 @@
 #include <wand/MagickWand.h>
 
 #include "Color.h"
-
+#include "MomentCalculator.h"
 
 namespace ImgProc {
 
@@ -49,6 +49,10 @@ public:
     virtual void set(Vector2 position, int channel, float value);
     virtual void set(Vector2 position, Color value);
 
+    MomentCalculator& getMomentCalculator() {
+        return momentCalculator;
+    }
+
     int getWidth() const {
         return width;
     }
@@ -72,6 +76,7 @@ public:
 
     virtual std::string toString();
 protected:
+    MomentCalculator momentCalculator;
     
     void loadFile(const char* file);
     void showError(MagickWand* wand);

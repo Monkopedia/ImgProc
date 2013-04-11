@@ -32,9 +32,10 @@ void dilateFunc(std::vector<std::string>* args, CommandInterface* interface);
 void thresholdFunc(std::vector<std::string>* args, CommandInterface* interface);
 void areaFunc(std::vector<std::string>* args, CommandInterface* interface);
 void perimeterFunc(std::vector<std::string>* args, CommandInterface* interface);
+void miFunc(std::vector<std::string>* args, CommandInterface* interface);
 void descriptorFunc(std::vector<std::string>* args, CommandInterface* interface);
 
-#define NFUNCS 25
+#define NFUNCS 26
 extern std::pair<std::string*, funcListener> *(functions[NFUNCS]);
 
 }

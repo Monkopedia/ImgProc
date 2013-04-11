@@ -9,7 +9,7 @@ using namespace std;
 
 namespace ImgProc {
 
-    Image::Image(const char* file) {
+    Image::Image(const char* file) : momentCalculator(this) {
         red = NULL;
         blue = NULL;
         green = NULL;
@@ -65,7 +65,7 @@ namespace ImgProc {
         MagickWandTerminus();
     }
 
-    Image::Image(const ImgProc::Image& base) {
+    Image::Image(const ImgProc::Image& base) : momentCalculator(this){
         red = NULL;
         blue = NULL;
         green = NULL;
@@ -79,7 +79,7 @@ namespace ImgProc {
         }
     }
 
-    Image::Image(int width, int height) {
+    Image::Image(int width, int height) : momentCalculator(this){
         red = NULL;
         blue = NULL;
         green = NULL;
