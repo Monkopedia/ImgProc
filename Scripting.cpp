@@ -13,6 +13,7 @@
 #include "HistogramEqualize.h"
 #include "ColorImage.h"
 #include "Area.h"
+#include "Eigens.h"
 #include "Perimeter.h"
 #include "MomentInvariant.h"
 
@@ -54,6 +55,7 @@ pair<string*, funcListener> *(functions[NFUNCS]) = {
 	new pair<string*, funcListener>(new string("combinetrans"), combineTransFunc),
 	new pair<string*, funcListener>(new string("transform"), transformFunc),
 	new pair<string*, funcListener>(new string("area"), areaFunc),
+	new pair<string*, funcListener>(new string("eigen"), eigenFunc),
 	new pair<string*, funcListener>(new string("moment"), miFunc),
 	new pair<string*, funcListener>(new string("perimeter"), perimeterFunc),
 	new pair<string*, funcListener>(new string("descriptor"), descriptorFunc),
@@ -562,6 +564,19 @@ void miFunc(vector<string>* args, CommandInterface* interface) {
     interface->setVar(varname, new MomentInvariant(channel));
     cout << "Created " << channel << " moment invariant calculator" << endl;
 }
+
+void eigenFunc(vector<string>* args, CommandInterface* interface) {
+    if (args->size() < 2) {
+        cout << "Usage: " << (*args)[0] << " varname" << endl;
+        cout << "\tDefines a eigen calculator" << endl;
+        return;
+    }
+    string varname = (*args)[1];
+
+    interface->setVar(varname, new Eigens());
+    cout << "Created  eigen calculator" << endl;
+}
+
 
 
 
